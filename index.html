@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smarter Chatbot Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        main {
+            margin: 50px auto;
+            max-width: 800px;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        p {
+            font-size: 1.1em;
+            line-height: 1.6;
+            text-align: left;
+        }
+        a {
+            color: #004aad;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        ul, ol {
+            margin-left: 20px;
+            text-align: left;
+        }
+        .bold {
+            font-weight: bold;
+        }
+
+        /* Styling for the Stripe Buy Button */
+        stripe-buy-button {
+            display: block;
+            margin: 20px auto; /* Center the button */
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>Welcome to the Bath SU Chatbot Demo</h1>
+
+        <p>Monitor and manage your agent through your dashboard at <a href="https://dashboard.adanac.ai/" target="_blank">dashboard.adanac.ai</a>. Username and password: <strong>SUbath24!</strong></p>
+
+        <p>Your agent’s responses are currently limited to these pages: <a href="https://www.thesubath.com/sport/faqs" target="_blank">https://www.thesubath.com/sport/faqs</a></p>
+
+        <p>If it can’t find an answer, users will be prompted to fill out a form, and their responses will be sent directly to your email for follow-up.</p>
+
+        <p>Try asking: <span class="bold">"How can I activate my sports pass?", "Do you have any sports equipment to hire?", or "I play varsity hockey, can I get a sports scholarship?"</span></p>
+
+        <p>Setting up your AI Agent “Addie” is quick and easy:</p>
+        <ol>
+            <li>Submit your website to Addie’s knowledge base and specify where to send any questions that Addie can't answer.</li>
+            <li>Simply embed the code on your site and a pop-up widget will appear instantly.</li>
+            <li>Start using the dashboard to monitor transcripts and analytics.</li>
+            <li>Improve the chatbot by updating the knowledge base to confidently handle more queries over time.</li>
+        </ol>
+
+        <p>Our Starter FAQ Agent package is available for £150 per month, and it includes:</p>
+        <ul>
+            <li>AI-powered FAQ agent “Addie”</li>
+            <li>Pop-up chatbot widget code</li>
+            <li>10 queries per day</li>
+            <li>Dashboard analytics</li>
+            <li>Unlimited knowledge base</li>
+            <li>Lead capture abilities</li>
+            <li>Custom branding</li>
+            <li>Latest GPT-4 model</li>
+            <li>Option for widget to only appear during non-office hours</li>
+        </ul>
+
+        <p>Add-ons:</p>
+        <ul>
+            <li>Additional agents</li>
+            <li>Custom integrations (Instagram, email…)</li>
+            <li>Raise daily query limit</li>
+        </ul>
+
+        <!-- Stripe Buy Button -->
+        <script async src="https://js.stripe.com/v3/buy-button.js"></script>
+        <stripe-buy-button
+          buy-button-id="buy_btn_1PvDnwDxxI4WXwGxyAo6hz44"
+          publishable-key="pk_live_51OsA0uDxxI4WXwGxv3auGXCn4SyVDqe8Tjs5siybENVgNxDbuFggYw6DxPfbq7X0SKnG7fRk7b5CSrwtC2TGhf1E00gHU6mwcf">
+        </stripe-buy-button>
+    </main>
+
+    <script>
+        const FormExtension = {
+            name: 'Forms',
+            type: 'response',
+            match: ({ trace }) => trace.type === 'ext_form' || trace.payload.name === 'ext_form',
+            render: ({ trace, element }) => {
+                const formContainer = document.createElement('form');
+                formContainer.innerHTML = `
+                    <style>
+                        label { font-size: 0.8em; color: #888; }
+                        input[type="text"], input[type="email"], input[type="tel"] { width: 100%; border: none; border-bottom: 0.5px solid rgba(0, 0, 0, 0.1); background: transparent; margin: 5px 0; outline: none; }
+                        .invalid { border-color: red; }
+                        .submit { background: linear-gradient(to right, #2e6ee1, #2e7ff1); border: none; color: white; padding: 10px; border-radius: 5px; width: 100%; cursor: pointer; }
+                    </style>
+                    <label for="name">Name</label>
+                    <input type="text" class="name" name="name" required><br><br>
+                    <label for="email">Email</label>
+                    <input type="email" class="email" name="email" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}$" title="Invalid email address"><br><br>
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" class="phone" name="phone" required pattern="\\d+" title="Invalid phone number, please enter only numbers"><br><br>
+                    <label for="message">Message</label>
+                    <input type="text" class="message" name="message" required><br><br>
+                    <input type="submit" class="submit" value="Submit">
+                `;
+                formContainer.addEventListener('submit', function (event) {
+                    event.preventDefault();
+                    const name = formContainer.querySelector('.name');
+                    const email = formContainer.querySelector('.email');
+                    const phone = formContainer.querySelector('.phone');
+                    const message = formContainer.querySelector('.message');
+                    if (!name.checkValidity() || !email.checkValidity() || !phone.checkValidity() || !message.checkValidity()) {
+                        name.classList.add('invalid');
+                        email.classList.add('invalid');
+                        phone.classList.add('invalid');
+                        message.classList.add('invalid');
+                        return;
+                    }
+                    formContainer.querySelector('.submit').remove();
+                    window.voiceflow.chat.interact({
+                        type: 'complete',
+                        payload: { name: name.value, email: email.value, phone: phone.value, message: message.value },
+                    });
+                });
+                element.appendChild(formContainer);
+            }
+        }
+        // Load the Voiceflow widget script and initialize it
+        const widgetScript = document.createElement('script');
+        widgetScript.src = 'https://cdn.voiceflow.com/widget/bundle.mjs';
+        widgetScript.onload = function() {
+            window.voiceflow.chat.load({
+                verify: { projectID: '66c0873db8d94e5f7fb84601' },
+                url: 'https://general-runtime.voiceflow.com',
+                versionID: 'production',
+                assistant: {
+                    extensions: [FormExtension]
+                }
+            })
+            .then(() => {
+                window.voiceflow.chat.proactive.push({
+                    type: 'text',
+                    payload: { message: 'Psst... over here!'}
+                });
+            })
+            .catch((error) => {
+                console.error("Error loading Voiceflow chat:", error);
+            });
+        };
+
+        document.head.appendChild(widgetScript);
+    </script>
+</body>
+</html>
