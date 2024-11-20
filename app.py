@@ -30,6 +30,9 @@ def home():
 @app.route('/search', methods=['POST'])
 def search_properties():
     try:
+        # Create a new connection for this request
+        conn = libsql.connect(TURSO_DATABASE_URL, auth_token=TURSO_API_TOKEN)
+
         # Parse incoming JSON request
         data = request.get_json()
         beds = data.get("beds")
@@ -89,8 +92,5 @@ def search_properties():
         print("Error executing search:", e)
         return jsonify({"error": "Failed to execute search"}), 500
 
-
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
-
+    app.run(host="0.0.0.0", port=5000, debug=True)
